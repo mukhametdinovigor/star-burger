@@ -5,6 +5,8 @@ from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
 
 from .models import Product, OrderItems, CustomerDetails
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
 def banners_list_api(request):
@@ -59,8 +61,14 @@ def product_list_api(request):
     })
 
 
+@api_view(['POST'])
 def register_order(request):
-    customer_order = json.loads(request.body.decode())
+    try:
+        customer_order = request.data
+    except ValueError:
+        return JsonResponse({
+            'error': 'ValueError',
+        })
     customer = CustomerDetails.objects.create(
         first_name=customer_order['firstname'],
         last_name=customer_order['lastname'],
@@ -74,4 +82,6 @@ def register_order(request):
             quantity=product['quantity']
         )
 
-    return JsonResponse({})
+    return Response({})
+
+# {"products": [{"product": 4, "quantity": 1}], "firstname": "Иван", "lastname": "Иванов", "phonenumber": "+79148556840", "address": "Москва Фестивальная  д.5 кв.15"}
