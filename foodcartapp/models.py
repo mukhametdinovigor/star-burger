@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Restaurant(models.Model):
@@ -30,8 +31,8 @@ class ProductQuerySet(models.QuerySet):
     def available(self):
         products = (
             RestaurantMenuItem.objects
-            .filter(availability=True)
-            .values_list('product')
+                .filter(availability=True)
+                .values_list('product')
         )
         return self.filter(pk__in=products)
 
@@ -79,7 +80,7 @@ class Product(models.Model):
     )
     description = models.TextField(
         'описание',
-        max_length=200,
+        max_length=400,
         blank=True,
     )
 
@@ -121,3 +122,39 @@ class RestaurantMenuItem(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
+
+
+class CustomerDetails(models.Model):
+    first_name = models.CharField('Имя', max_length=50)
+    last_name = models.CharField('Фамилия', max_length=50)
+    phone_number = PhoneNumberField('Телефон')
+    address = models.CharField('Адрес', max_length=100)
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+
+class OrderItems(models.Model):
+    user = models.ForeignKey(
+        CustomerDetails,
+        related_name='order_items',
+        verbose_name="элементы заказа",
+        on_delete=models.CASCADE,
+    )
+    product = models.ForeignKey(
+        Product,
+        related_name='orders',
+        verbose_name='Товар',
+        on_delete=models.CASCADE,)
+    quantity = models.IntegerField('Количество', validators=[MinValueValidator(1)])
+
+    class Meta:
+        verbose_name = 'элемент заказа'
+        verbose_name_plural = 'элементы заказа'
+
+    def __str__(self):
+        return f"{self.product.name} {self.user.first_name} {self.user.last_name}"

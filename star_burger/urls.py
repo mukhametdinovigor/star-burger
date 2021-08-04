@@ -33,3 +33,4 @@ if settings.DEBUG:
     urlpatterns = [
         path(r'__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+# http://127.0.0.1:8000/api/order/
