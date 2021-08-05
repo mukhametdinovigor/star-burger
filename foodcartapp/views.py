@@ -1,5 +1,3 @@
-import json
-
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
@@ -7,6 +5,8 @@ from django.shortcuts import get_object_or_404
 from .models import Product, OrderItems, CustomerDetails
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+
 
 
 def banners_list_api(request):
@@ -65,23 +65,28 @@ def product_list_api(request):
 def register_order(request):
     try:
         customer_order = request.data
-    except ValueError:
-        return JsonResponse({
-            'error': 'ValueError',
-        })
-    customer = CustomerDetails.objects.create(
-        first_name=customer_order['firstname'],
-        last_name=customer_order['lastname'],
-        phone_number=customer_order['phonenumber'],
-        address=customer_order['address']
-    )
-    for product in customer_order['products']:
-        OrderItems.objects.create(
-            user=get_object_or_404(CustomerDetails, id=customer.id),
-            product=get_object_or_404(Product, id=product['product']),
-            quantity=product['quantity']
+        if not isinstance(customer_order['products'], list) or not customer_order['products']:
+            return Response({
+                'error': 'product key is not presented or not list',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        customer = CustomerDetails.objects.create(
+            first_name=customer_order['firstname'],
+            last_name=customer_order['lastname'],
+            phone_number=customer_order['phonenumber'],
+            address=customer_order['address']
         )
+        for product in customer_order['products']:
+            OrderItems.objects.create(
+                user=get_object_or_404(CustomerDetails, id=customer.id),
+                product=get_object_or_404(Product, id=product['product']),
+                quantity=product['quantity']
+            )
 
-    return Response({})
+        return Response({'pam pam': 'product presented in list'}, status=status.HTTP_200_OK)
+    except KeyError:
+        return Response({
+            'error': 'product key is not presented or not list',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 # {"products": [{"product": 4, "quantity": 1}], "firstname": "Иван", "lastname": "Иванов", "phonenumber": "+79148556840", "address": "Москва Фестивальная  д.5 кв.15"}
