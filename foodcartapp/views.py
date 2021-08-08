@@ -1,8 +1,6 @@
-import phonenumbers
 from django.http import JsonResponse
 from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
-from phonenumbers import NumberParseException
 from rest_framework import status
 
 from .models import Product, OrderItems, CustomerDetails
@@ -70,7 +68,7 @@ class OrderItemsSerializer(ModelSerializer):
 
 
 class CustomerDetailsSerializer(ModelSerializer):
-    products = OrderItemsSerializer(many=True, allow_empty=False)
+    products = OrderItemsSerializer(many=True, allow_empty=False, write_only=True)
 
     class Meta:
         model = CustomerDetails
@@ -87,14 +85,16 @@ def register_order(request):
         phonenumber=serializer.validated_data['phonenumber'],
         address=serializer.validated_data['address']
     )
-
     for product in serializer.validated_data['products']:
         OrderItems.objects.create(
             user=get_object_or_404(CustomerDetails, id=customer.id),
             product=get_object_or_404(Product, id=product['product'].id),
             quantity=product['quantity']
         )
-    return Response({'pam pam': 'product presented in list'}, status=status.HTTP_200_OK)
+
+    order_details = {'id': customer.id}
+    order_details.update(serializer.data)
+    return Response(order_details, status=status.HTTP_200_OK)
 
 
 # {"products": [{"product": 4, "quantity": 1}], "firstname": "Иван", "lastname": "Иванов", "phonenumber": "+79148556840", "address": "Москва Фестивальная  д.5 кв.15"}
