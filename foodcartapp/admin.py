@@ -116,15 +116,15 @@ class OrderItemsInline(admin.TabularInline):
 @admin.register(CustomerDetails)
 class CustomerDetailsAdmin(admin.ModelAdmin):
     list_display = [
-        'first_name',
-        'last_name',
-        'phone_number',
+        'firstname',
+        'lastname',
+        'phonenumber',
         'address',
     ]
 
     list_display_links = [
-        'first_name',
-        'last_name',
+        'firstname',
+        'lastname',
     ]
     inlines = [
         OrderItemsInline
