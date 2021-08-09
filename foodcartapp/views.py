@@ -3,7 +3,7 @@ from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
-from .models import Product, OrderItems, CustomerDetails
+from .models import Product, OrderItems, CustomerOrderDetails
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
@@ -67,19 +67,19 @@ class OrderItemsSerializer(ModelSerializer):
         fields = ['product', 'quantity']
 
 
-class CustomerDetailsSerializer(ModelSerializer):
+class CustomerOrderDetailsSerializer(ModelSerializer):
     products = OrderItemsSerializer(many=True, allow_empty=False, write_only=True)
 
     class Meta:
-        model = CustomerDetails
+        model = CustomerOrderDetails
         fields = ['products', 'firstname', 'lastname', 'phonenumber', 'address']
 
 
 @api_view(['POST'])
 def register_order(request):
-    serializer = CustomerDetailsSerializer(data=request.data)
+    serializer = CustomerOrderDetailsSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    customer = CustomerDetails.objects.create(
+    customer = CustomerOrderDetails.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
         phonenumber=serializer.validated_data['phonenumber'],
@@ -87,7 +87,7 @@ def register_order(request):
     )
     for product in serializer.validated_data['products']:
         OrderItems.objects.create(
-            user=get_object_or_404(CustomerDetails, id=customer.id),
+            user=get_object_or_404(CustomerOrderDetails, id=customer.id),
             product=get_object_or_404(Product, id=product['product'].id),
             quantity=product['quantity']
         )

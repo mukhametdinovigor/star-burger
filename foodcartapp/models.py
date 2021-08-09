@@ -124,7 +124,7 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
-class CustomerDetails(models.Model):
+class CustomerOrderDetails(models.Model):
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')
@@ -140,7 +140,7 @@ class CustomerDetails(models.Model):
 
 class OrderItems(models.Model):
     user = models.ForeignKey(
-        CustomerDetails,
+        CustomerOrderDetails,
         related_name='order_items',
         verbose_name="элементы заказа",
         on_delete=models.CASCADE,

@@ -7,7 +7,7 @@ from .models import Product
 from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
-from .models import CustomerDetails
+from .models import CustomerOrderDetails
 from .models import OrderItems
 
 
@@ -113,8 +113,8 @@ class OrderItemsInline(admin.TabularInline):
     extra = 0
 
 
-@admin.register(CustomerDetails)
-class CustomerDetailsAdmin(admin.ModelAdmin):
+@admin.register(CustomerOrderDetails)
+class CustomerOrderDetailsAdmin(admin.ModelAdmin):
     list_display = [
         'firstname',
         'lastname',

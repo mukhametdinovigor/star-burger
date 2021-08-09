@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='CustomerDetails',
+            name='CustomerOrderDetails',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=50, verbose_name='Имя')),
-                ('last_name', models.CharField(max_length=50, verbose_name='Фамилия')),
-                ('phone_number', phonenumber_field.modelfields.PhoneNumberField(max_length=128, region=None, verbose_name='Телефон')),
+                ('firstname', models.CharField(max_length=50, verbose_name='Имя')),
+                ('lastname', models.CharField(max_length=50, verbose_name='Фамилия')),
+                ('phonenumber', phonenumber_field.modelfields.PhoneNumberField(max_length=128, region=None, verbose_name='Телефон')),
                 ('address', models.CharField(max_length=100, verbose_name='Адрес')),
             ],
             options={
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('quantity', models.IntegerField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='Количество')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to='foodcartapp.product', verbose_name='Товар')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order_items', to='foodcartapp.customerdetails', verbose_name='элементы заказа')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order_items', to='foodcartapp.customerorderdetails', verbose_name='элементы заказа')),
             ],
             options={
                 'verbose_name': 'элемент заказа',
