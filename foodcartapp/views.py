@@ -86,11 +86,13 @@ def register_order(request):
         address=serializer.validated_data['address']
     )
     for product in serializer.validated_data['products']:
+        order_product = get_object_or_404(Product, name=product['product'])
         OrderItems.objects.create(
             user=get_object_or_404(CustomerOrderDetails, id=customer.id),
             product=get_object_or_404(Product, id=product['product'].id),
-            quantity=product['quantity']
-        )
+            quantity=product['quantity'],
+            cost=order_product.price * product['quantity']
+            )
 
     order_details = {'id': customer.id}
     order_details.update(serializer.data)

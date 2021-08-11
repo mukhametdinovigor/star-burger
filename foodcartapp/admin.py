@@ -115,17 +115,12 @@ class OrderItemsInline(admin.TabularInline):
 
 @admin.register(CustomerOrderDetails)
 class CustomerOrderDetailsAdmin(admin.ModelAdmin):
-    list_display = [
-        'firstname',
-        'lastname',
-        'phonenumber',
-        'address',
-    ]
+    list_display = ('full_name', 'phonenumber', 'address')
 
-    list_display_links = [
-        'firstname',
-        'lastname',
-    ]
+    @admin.display(description='Name')
+    def full_name(self, obj):
+        return f'{obj.firstname} {obj.lastname}'
+
     inlines = [
         OrderItemsInline
     ]
