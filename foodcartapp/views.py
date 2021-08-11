@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db import transaction
 from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -76,6 +77,7 @@ class CustomerOrderDetailsSerializer(ModelSerializer):
 
 
 @api_view(['POST'])
+@transaction.atomic
 def register_order(request):
     serializer = CustomerOrderDetailsSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
