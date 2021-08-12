@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import Sum
@@ -139,6 +140,9 @@ class CustomerOrderDetails(models.Model):
     status = models.CharField('Статус заказа', max_length=50, choices=[('Обработанный', 'Обработанный'),
                                                                        ('Необработанный', 'Необработанный')], default='Необработанный')
     comments = models.TextField('Комментарии к заказу', blank=True)
+    created_at = models.DateTimeField('Время создания', default=timezone.now)
+    called_at = models.DateTimeField('Время звонка', blank=True, null=True)
+    delivered_at = models.DateTimeField('Время доставки', blank=True, null=True)
 
     objects = CustomerOrderItemsQuerySet.as_manager()
 
