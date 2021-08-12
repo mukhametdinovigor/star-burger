@@ -138,6 +138,7 @@ class CustomerOrderDetails(models.Model):
     address = models.CharField('Адрес', max_length=100)
     status = models.CharField('Статус заказа', max_length=50, choices=[('Обработанный', 'Обработанный'),
                                                                        ('Необработанный', 'Необработанный')], default='Необработанный')
+    comments = models.TextField('Комментарии к заказу', blank=True)
 
     objects = CustomerOrderItemsQuerySet.as_manager()
 

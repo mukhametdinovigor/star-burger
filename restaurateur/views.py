@@ -102,6 +102,7 @@ def serialize_order(order):
         'cost': order.cost,
         'fullname': f'{order.firstname} {order.lastname}',
         'phonenumber': order.phonenumber,
+        'comments': order.comments,
         'address': order.address
     }
 
