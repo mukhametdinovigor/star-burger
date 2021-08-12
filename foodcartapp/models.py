@@ -139,6 +139,8 @@ class CustomerOrderDetails(models.Model):
     address = models.CharField('Адрес', max_length=100)
     status = models.CharField('Статус заказа', max_length=50, choices=[('Обработанный', 'Обработанный'),
                                                                        ('Необработанный', 'Необработанный')], default='Необработанный')
+    payment_method = models.CharField('Статус заказа', max_length=50, choices=[('Наличностью', 'Наличностью'),
+                                                                               ('Электронно', 'Электронно')], default='Наличностью')
     comments = models.TextField('Комментарии к заказу', blank=True)
     created_at = models.DateTimeField('Время создания', default=timezone.now)
     called_at = models.DateTimeField('Время звонка', blank=True, null=True)
@@ -165,7 +167,7 @@ class OrderItems(models.Model):
         Product,
         related_name='orders',
         verbose_name='Товар',
-        on_delete=models.CASCADE,)
+        on_delete=models.CASCADE, )
     quantity = models.IntegerField('Количество', validators=[MinValueValidator(1)])
     cost = models.DecimalField(
         'стоимость',

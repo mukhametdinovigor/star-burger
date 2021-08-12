@@ -99,6 +99,7 @@ def serialize_order(order):
     return {
         'id': order.id,
         'status': order.status,
+        'payment_method': order.payment_method,
         'cost': order.cost,
         'fullname': f'{order.firstname} {order.lastname}',
         'phonenumber': order.phonenumber,
