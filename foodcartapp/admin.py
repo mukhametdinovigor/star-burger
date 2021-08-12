@@ -117,7 +117,10 @@ class OrderItemsInline(admin.TabularInline):
 
 @admin.register(CustomerOrderDetails)
 class CustomerOrderDetailsAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'phonenumber', 'address')
+    list_display = ('full_name', 'phonenumber', 'address', 'status')
+    list_filter = [
+        'status',
+    ]
 
     def response_change(self, request, obj):
         res = super(CustomerOrderDetailsAdmin, self).response_change(request, obj)

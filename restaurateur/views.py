@@ -98,6 +98,7 @@ def view_restaurants(request):
 def serialize_order(order):
     return {
         'id': order.id,
+        'status': order.status,
         'cost': order.cost,
         'fullname': f'{order.firstname} {order.lastname}',
         'phonenumber': order.phonenumber,
