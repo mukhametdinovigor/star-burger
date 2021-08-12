@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .models import Product
 from .models import ProductCategory
@@ -9,6 +10,7 @@ from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import CustomerOrderDetails
 from .models import OrderItems
+from star_burger.settings import ALLOWED_HOSTS
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -116,6 +118,15 @@ class OrderItemsInline(admin.TabularInline):
 @admin.register(CustomerOrderDetails)
 class CustomerOrderDetailsAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'phonenumber', 'address')
+
+    def response_change(self, request, obj):
+        res = super(CustomerOrderDetailsAdmin, self).response_change(request, obj)
+        if "next" in request.GET:
+            if url_has_allowed_host_and_scheme(request.GET['next'], ALLOWED_HOSTS):
+                return redirect(request.GET['next'])
+            return res
+        else:
+            return res
 
     @admin.display(description='Name')
     def full_name(self, obj):
