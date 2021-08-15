@@ -126,7 +126,7 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
-class CustomerOrderItemsQuerySet(models.QuerySet):
+class CustomerOrderDetailsQuerySet(models.QuerySet):
     def get_order_with_cost(self):
         order_with_cost = self.annotate(cost=Sum('order_items__cost'))
         return order_with_cost
@@ -141,12 +141,16 @@ class CustomerOrderDetails(models.Model):
                                                                        ('Необработанный', 'Необработанный')], default='Необработанный')
     payment_method = models.CharField('Статус заказа', max_length=50, choices=[('Наличностью', 'Наличностью'),
                                                                                ('Электронно', 'Электронно')], default='Наличностью')
+    restaurants = models.ManyToManyField(Restaurant,
+                                         related_name='order',
+                                         verbose_name='Рестораны',
+                                         blank=True)
     comments = models.TextField('Комментарии к заказу', blank=True)
     created_at = models.DateTimeField('Время создания', default=timezone.now)
     called_at = models.DateTimeField('Время звонка', blank=True, null=True)
     delivered_at = models.DateTimeField('Время доставки', blank=True, null=True)
 
-    objects = CustomerOrderItemsQuerySet.as_manager()
+    objects = CustomerOrderDetailsQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Заказ'

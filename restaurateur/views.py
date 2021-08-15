@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant, CustomerOrderDetails
+from foodcartapp.models import Product, Restaurant, CustomerOrderDetails, RestaurantMenuItem, OrderItems
 
 
 class Login(forms.Form):
@@ -96,9 +96,26 @@ def view_restaurants(request):
 
 
 def serialize_order(order):
+    menu = RestaurantMenuItem.objects.select_related('restaurant')
+    restaurants_in_order = []
+    restaurants_in_product = set()
+    products_in_order = order.order_items.all()
+    for product in products_in_order:
+        restaurants = menu.filter(product_id=product.product.id)
+        for restaurant in restaurants:
+            if restaurant.availability:
+                restaurants_in_product.add(restaurant.restaurant.name.split()[-1])
+        restaurants_in_order.append(restaurants_in_product.copy())
+        restaurants_in_product.clear()
+    unique_restaurants = restaurants_in_order[0]
+    for index, _ in enumerate(restaurants_in_order):
+        unique_restaurants = unique_restaurants.intersection(restaurants_in_order[index])
+
+    restaurants_in_order = unique_restaurants
     return {
         'id': order.id,
         'status': order.status,
+        'restaurants': restaurants_in_order,
         'payment_method': order.payment_method,
         'cost': order.cost,
         'fullname': f'{order.firstname} {order.lastname}',
@@ -110,10 +127,9 @@ def serialize_order(order):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    order_items = CustomerOrderDetails.objects.get_order_with_cost()
+    order_items = CustomerOrderDetails.objects.get_order_with_cost().prefetch_related('order_items__product')
     context = {
         'order_items': [serialize_order(order) for order in order_items]
     }
 
-    print(request)
     return render(request, template_name='order_items.html', context=context)
