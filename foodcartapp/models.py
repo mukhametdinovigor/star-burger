@@ -185,3 +185,34 @@ class OrderItems(models.Model):
 
     def __str__(self):
         return f"{self.product.name} {self.user.firstname} {self.user.lastname}"
+
+
+class Place(models.Model):
+    address = models.CharField(
+        'адрес',
+        max_length=100,
+        blank=True,
+        unique=True
+    )
+    lat = models.CharField(
+        'широта',
+        max_length=100,
+        blank=True,
+    )
+    lon = models.CharField(
+        'долгота',
+        max_length=100,
+        blank=True,
+    )
+    update_date = models.DateTimeField(
+        'дата обновления',
+        default=timezone.now
+    )
+
+
+    class Meta:
+        verbose_name = 'Место'
+        verbose_name_plural = 'Места'
+
+    def __str__(self):
+        return self.address

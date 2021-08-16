@@ -1,4 +1,3 @@
-import requests
 from geopy import distance
 
 from django import forms
@@ -10,8 +9,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-
-from foodcartapp.models import Product, Restaurant, CustomerOrderDetails, RestaurantMenuItem, OrderItems
+from foodcartapp.models import Product, Restaurant, CustomerOrderDetails, RestaurantMenuItem, Place
+from foodcartapp.utils import fetch_coordinates
+from star_burger.settings import YANDEX_GEOCODE_APIKEY
 
 
 class Login(forms.Form):
@@ -74,7 +74,6 @@ def view_products(request):
     default_availability = {restaurant.id: False for restaurant in restaurants}
     products_with_restaurants = []
     for product in products:
-
         availability = {
             **default_availability,
             **{item.restaurant_id: item.availability for item in product.menu_items.all()},
@@ -98,28 +97,18 @@ def view_restaurants(request):
     })
 
 
-def fetch_coordinates(apikey, address):
-    base_url = "https://geocode-maps.yandex.ru/1.x"
-    response = requests.get(base_url, params={
-        "geocode": address,
-        "apikey": apikey,
-        "format": "json",
-    })
-    response.raise_for_status()
-    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
-
-    if not found_places:
-        return None
-
-    most_relevant = found_places[0]
-    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
-    return lat, lon
-
-
 def get_order_distance(restaurant_address, order_address):
-    restaurant_coords = fetch_coordinates('ee75d4fd-9401-4483-8495-d73b5a632f62', restaurant_address)
-    order_coords = fetch_coordinates('ee75d4fd-9401-4483-8495-d73b5a632f62', order_address)
-    order_distance = "{:.3f}".format(distance.distance(restaurant_coords, order_coords).km)
+    order_place, created = Place.objects.get_or_create(
+        address=order_address,
+        defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, order_address))}
+    )
+    order_coords = order_place.lat, order_place.lon
+    restaurant_place, created = Place.objects.get_or_create(
+        address=restaurant_address,
+        defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, restaurant_address))}
+    )
+    restaurant_coords = restaurant_place.lat, restaurant_place.lon
+    order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
     return order_distance
 
 
@@ -145,7 +134,6 @@ def serialize_order(order):
         'id': order.id,
         'status': order.status,
         'restaurants': restaurants_in_order,
-
         'payment_method': order.payment_method,
         'cost': order.cost,
         'fullname': f'{order.firstname} {order.lastname}',
@@ -157,16 +145,9 @@ def serialize_order(order):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    # restaurant_address = Restaurant.objects.all().last().address
-    # order_address = CustomerOrderDetails.objects.all().last().address
-    # restaurant_coords = fetch_coordinates('ee75d4fd-9401-4483-8495-d73b5a632f62', restaurant_address)
-    # order_coords = fetch_coordinates('ee75d4fd-9401-4483-8495-d73b5a632f62', order_address)
-    # dist = "{:.3f}".format(distance.distance(restaurant_coords, order_coords).km)
-
     order_items = CustomerOrderDetails.objects.get_order_with_cost().prefetch_related('order_items__product')
     context = {
         'order_items': [serialize_order(order) for order in order_items],
-        # 'dist': dist
     }
 
     return render(request, template_name='order_items.html', context=context)

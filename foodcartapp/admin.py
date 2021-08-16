@@ -10,6 +10,7 @@ from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import CustomerOrderDetails
 from .models import OrderItems
+from .models import Place
 from star_burger.settings import ALLOWED_HOSTS
 
 
@@ -138,4 +139,9 @@ class CustomerOrderDetailsAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemsInline
     ]
+
+
+@admin.register(Place)
+class PlaceAdmin(admin.ModelAdmin):
+    pass
 

@@ -99,6 +99,3 @@ def register_order(request):
     order_details = {'id': customer.id}
     order_details.update(serializer.data)
     return Response(order_details, status=status.HTTP_200_OK)
-
-
-# {"products": [{"product": 4, "quantity": 1}], "firstname": "Иван", "lastname": "Иванов", "phonenumber": "+79148556840", "address": "Москва Фестивальная  д.5 кв.15"}
