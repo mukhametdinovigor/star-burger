@@ -137,10 +137,12 @@ class CustomerOrderDetails(models.Model):
     lastname = models.CharField('Фамилия', max_length=50)
     phonenumber = PhoneNumberField('Телефон')
     address = models.CharField('Адрес', max_length=100)
-    status = models.CharField('Статус заказа', max_length=50, choices=[('Обработанный', 'Обработанный'),
-                                                                       ('Необработанный', 'Необработанный')], default='Необработанный')
-    payment_method = models.CharField('Статус заказа', max_length=50, choices=[('Наличностью', 'Наличностью'),
-                                                                               ('Электронно', 'Электронно')], default='Наличностью')
+    status = models.CharField('Статус заказа', max_length=50,
+                              choices=[('Обработанный', 'Обработанный'),
+                                       ('Необработанный', 'Необработанный')], default='Необработанный')
+    payment_method = models.CharField('Платежный метод', max_length=50, blank=True,
+                                      choices=[('Наличностью', 'Наличностью'),
+                                               ('Электронно', 'Электронно')])
     restaurants = models.ManyToManyField(Restaurant,
                                          related_name='order',
                                          verbose_name='Рестораны',
@@ -208,7 +210,6 @@ class Place(models.Model):
         'дата обновления',
         default=timezone.now
     )
-
 
     class Meta:
         verbose_name = 'Место'
