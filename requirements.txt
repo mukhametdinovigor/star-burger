@@ -2,7 +2,8 @@ django==3.2
 django-debug-toolbar==2.2
 Pillow==8.2.0
 environs[django]==9.3.2
-
 djangorestframework~=3.12.4
-
 requests==2.26.0
+geopy==2.2.0
+phonenumbers==8.12.28
+django-phonenumber-field==5.2.0
