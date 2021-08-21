@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-from foodcartapp.models import Product, Restaurant, CustomerOrderDetails, RestaurantMenuItem, Place
+from foodcartapp.models import Product, Restaurant, OrderDetails, RestaurantMenuItem, Place
 from foodcartapp.utils import fetch_coordinates
 from star_burger.settings import YANDEX_GEOCODE_APIKEY
 
@@ -145,7 +145,7 @@ def serialize_order(order):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    order_items = CustomerOrderDetails.objects.get_order_with_cost().prefetch_related('order_items__product')
+    order_items = OrderDetails.objects.get_order_with_cost().prefetch_related('order_items__product')
     context = {
         'order_items': [serialize_order(order) for order in order_items],
     }

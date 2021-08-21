@@ -126,13 +126,13 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
-class CustomerOrderDetailsQuerySet(models.QuerySet):
+class OrderDetailsQuerySet(models.QuerySet):
     def get_order_with_cost(self):
         order_with_cost = self.annotate(cost=Sum('order_items__cost'))
         return order_with_cost
 
 
-class CustomerOrderDetails(models.Model):
+class OrderDetails(models.Model):
     firstname = models.CharField('Имя', max_length=50, db_index=True)
     lastname = models.CharField('Фамилия', max_length=50, db_index=True)
     phonenumber = PhoneNumberField('Телефон', db_index=True)
@@ -157,7 +157,7 @@ class CustomerOrderDetails(models.Model):
     called_at = models.DateTimeField('Время звонка', blank=True, null=True, db_index=True)
     delivered_at = models.DateTimeField('Время доставки', blank=True, null=True, db_index=True)
 
-    objects = CustomerOrderDetailsQuerySet.as_manager()
+    objects = OrderDetailsQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Заказ'
@@ -169,7 +169,7 @@ class CustomerOrderDetails(models.Model):
 
 class OrderItems(models.Model):
     user = models.ForeignKey(
-        CustomerOrderDetails,
+        OrderDetails,
         related_name='order_items',
         verbose_name="элементы заказа",
         on_delete=models.CASCADE,

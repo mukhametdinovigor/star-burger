@@ -8,7 +8,7 @@ from .models import Product
 from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
-from .models import CustomerOrderDetails
+from .models import OrderDetails
 from .models import OrderItems
 from .models import Place
 from star_burger.settings import ALLOWED_HOSTS
@@ -116,15 +116,15 @@ class OrderItemsInline(admin.TabularInline):
     extra = 0
 
 
-@admin.register(CustomerOrderDetails)
-class CustomerOrderDetailsAdmin(admin.ModelAdmin):
+@admin.register(OrderDetails)
+class OrderDetailsAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'phonenumber', 'address', 'status')
     list_filter = [
         'status',
     ]
 
     def response_change(self, request, obj):
-        res = super(CustomerOrderDetailsAdmin, self).response_change(request, obj)
+        res = super(OrderDetailsAdmin, self).response_change(request, obj)
         if "next" in request.GET:
             if url_has_allowed_host_and_scheme(request.GET['next'], ALLOWED_HOSTS):
                 return redirect(request.GET['next'])
