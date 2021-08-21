@@ -9,7 +9,7 @@ from .models import ProductCategory
 from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import OrderDetails
-from .models import OrderItems
+from .models import OrderItem
 from place.models import Place
 from star_burger.settings import ALLOWED_HOSTS
 
@@ -111,8 +111,8 @@ class ProductAdmin(admin.ModelAdmin):
     pass
 
 
-class OrderItemsInline(admin.TabularInline):
-    model = OrderItems
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
     extra = 0
 
 
@@ -137,7 +137,7 @@ class OrderDetailsAdmin(admin.ModelAdmin):
         return f'{obj.firstname} {obj.lastname}'
 
     inlines = [
-        OrderItemsInline
+        OrderItemInline
     ]
 
 

@@ -4,7 +4,7 @@ from django.templatetags.static import static
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
-from .models import Product, OrderItems, OrderDetails
+from .models import Product, OrderItem, OrderDetails
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
@@ -62,14 +62,14 @@ def product_list_api(request):
     })
 
 
-class OrderItemsSerializer(ModelSerializer):
+class OrderItemSerializer(ModelSerializer):
     class Meta:
-        model = OrderItems
+        model = OrderItem
         fields = ['product', 'quantity']
 
 
 class OrderDetailsSerializer(ModelSerializer):
-    products = OrderItemsSerializer(many=True, allow_empty=False, write_only=True)
+    products = OrderItemSerializer(many=True, allow_empty=False, write_only=True)
 
     class Meta:
         model = OrderDetails
@@ -81,7 +81,7 @@ class OrderDetailsSerializer(ModelSerializer):
 def register_order(request):
     serializer = OrderDetailsSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    customer = OrderDetails.objects.create(
+    customer_order = OrderDetails.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
         phonenumber=serializer.validated_data['phonenumber'],
@@ -89,13 +89,13 @@ def register_order(request):
     )
     for product in serializer.validated_data['products']:
         order_product = get_object_or_404(Product, name=product['product'])
-        OrderItems.objects.create(
-            user=get_object_or_404(OrderDetails, id=customer.id),
+        OrderItem.objects.create(
+            user=get_object_or_404(OrderDetails, id=customer_order.id),
             product=order_product,
             quantity=product['quantity'],
             order_cost=order_product.price * product['quantity']
             )
 
-    order_details = {'id': customer.id}
+    order_details = {'id': customer_order.id}
     order_details.update(serializer.data)
     return Response(order_details, status=status.HTTP_200_OK)

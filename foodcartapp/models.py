@@ -167,8 +167,8 @@ class OrderDetails(models.Model):
         return f"{self.firstname} {self.lastname}"
 
 
-class OrderItems(models.Model):
-    user = models.ForeignKey(
+class OrderItem(models.Model):
+    user_order_item = models.ForeignKey(
         OrderDetails,
         related_name='order_items',
         verbose_name="элементы заказа",
@@ -191,4 +191,4 @@ class OrderItems(models.Model):
         verbose_name_plural = 'элементы заказа'
 
     def __str__(self):
-        return f"{self.product.name} {self.user.firstname} {self.user.lastname}"
+        return f"{self.product.name} {self.user_order_item.firstname} {self.user_order_item.lastname}"
