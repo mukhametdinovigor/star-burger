@@ -146,10 +146,12 @@ class CustomerOrderDetails(models.Model):
                                       choices=[('Наличностью', 'Наличностью'),
                                                ('Электронно', 'Электронно')],
                                       db_index=True)
-    restaurants = models.ManyToManyField(Restaurant,
-                                         related_name='order',
-                                         verbose_name='Рестораны',
-                                         blank=True)
+    restaurants = models.ForeignKey(Restaurant,
+                                    on_delete=models.SET_NULL,
+                                    related_name='order',
+                                    verbose_name='Рестораны',
+                                    null=True,
+                                    blank=True)
     comments = models.TextField('Комментарии к заказу', blank=True)
     created_at = models.DateTimeField('Время создания', default=timezone.now, db_index=True)
     called_at = models.DateTimeField('Время звонка', blank=True, null=True, db_index=True)
