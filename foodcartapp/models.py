@@ -198,7 +198,6 @@ class Place(models.Model):
     address = models.CharField(
         'адрес',
         max_length=100,
-        blank=True,
         unique=True,
         db_index=True
     )
