@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-from foodcartapp.models import Product, Restaurant, OrderDetails, RestaurantMenuItem, Place
+from foodcartapp.models import Product, Restaurant, OrderDetails, RestaurantMenuItem
+from place.models import Place
 from foodcartapp.utils import fetch_coordinates
 from star_burger.settings import YANDEX_GEOCODE_APIKEY
 

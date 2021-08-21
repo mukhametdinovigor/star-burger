@@ -10,7 +10,7 @@ from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import OrderDetails
 from .models import OrderItems
-from .models import Place
+from place.models import Place
 from star_burger.settings import ALLOWED_HOSTS
 
 
