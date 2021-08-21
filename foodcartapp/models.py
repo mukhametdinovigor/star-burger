@@ -133,24 +133,27 @@ class CustomerOrderDetailsQuerySet(models.QuerySet):
 
 
 class CustomerOrderDetails(models.Model):
-    firstname = models.CharField('Имя', max_length=50)
-    lastname = models.CharField('Фамилия', max_length=50)
-    phonenumber = PhoneNumberField('Телефон')
-    address = models.CharField('Адрес', max_length=100)
+    firstname = models.CharField('Имя', max_length=50, db_index=True)
+    lastname = models.CharField('Фамилия', max_length=50, db_index=True)
+    phonenumber = PhoneNumberField('Телефон', db_index=True)
+    address = models.CharField('Адрес', max_length=100, db_index=True)
     status = models.CharField('Статус заказа', max_length=50,
                               choices=[('Обработанный', 'Обработанный'),
-                                       ('Необработанный', 'Необработанный')], default='Необработанный')
+                                       ('Необработанный', 'Необработанный')],
+                              default='Необработанный',
+                              db_index=True)
     payment_method = models.CharField('Платежный метод', max_length=50, blank=True,
                                       choices=[('Наличностью', 'Наличностью'),
-                                               ('Электронно', 'Электронно')])
+                                               ('Электронно', 'Электронно')],
+                                      db_index=True)
     restaurants = models.ManyToManyField(Restaurant,
                                          related_name='order',
                                          verbose_name='Рестораны',
                                          blank=True)
     comments = models.TextField('Комментарии к заказу', blank=True)
-    created_at = models.DateTimeField('Время создания', default=timezone.now)
-    called_at = models.DateTimeField('Время звонка', blank=True, null=True)
-    delivered_at = models.DateTimeField('Время доставки', blank=True, null=True)
+    created_at = models.DateTimeField('Время создания', default=timezone.now, db_index=True)
+    called_at = models.DateTimeField('Время звонка', blank=True, null=True, db_index=True)
+    delivered_at = models.DateTimeField('Время доставки', blank=True, null=True, db_index=True)
 
     objects = CustomerOrderDetailsQuerySet.as_manager()
 
@@ -194,7 +197,8 @@ class Place(models.Model):
         'адрес',
         max_length=100,
         blank=True,
-        unique=True
+        unique=True,
+        db_index=True
     )
     lat = models.CharField(
         'широта',
@@ -208,7 +212,8 @@ class Place(models.Model):
     )
     update_date = models.DateTimeField(
         'дата обновления',
-        default=timezone.now
+        default=timezone.now,
+        db_index=True
     )
 
     class Meta:
