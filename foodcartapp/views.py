@@ -91,7 +91,7 @@ def register_order(request):
         order_product = get_object_or_404(Product, name=product['product'])
         OrderItems.objects.create(
             user=get_object_or_404(OrderDetails, id=customer.id),
-            product=get_object_or_404(Product, id=product['product'].id),
+            product=order_product,
             quantity=product['quantity'],
             order_cost=order_product.price * product['quantity']
             )
