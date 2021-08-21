@@ -93,7 +93,7 @@ def register_order(request):
             user=get_object_or_404(OrderDetails, id=customer.id),
             product=get_object_or_404(Product, id=product['product'].id),
             quantity=product['quantity'],
-            cost=order_product.price * product['quantity']
+            order_cost=order_product.price * product['quantity']
             )
 
     order_details = {'id': customer.id}
