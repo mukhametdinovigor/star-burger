@@ -99,17 +99,20 @@ def view_restaurants(request):
 
 
 def get_order_distance(restaurant_address, order_address):
-    order_place, created = Place.objects.get_or_create(
-        address=order_address,
-        defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, order_address))}
-    )
-    order_coords = order_place.lat, order_place.lon
-    restaurant_place, created = Place.objects.get_or_create(
-        address=restaurant_address,
-        defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, restaurant_address))}
-    )
-    restaurant_coords = restaurant_place.lat, restaurant_place.lon
-    order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
+    try:
+        order_place, created = Place.objects.get_or_create(
+            address=order_address,
+            defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, order_address))}
+        )
+        order_coords = order_place.lat, order_place.lon
+        restaurant_place, created = Place.objects.get_or_create(
+            address=restaurant_address,
+            defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(YANDEX_GEOCODE_APIKEY, restaurant_address))}
+        )
+        restaurant_coords = restaurant_place.lat, restaurant_place.lon
+        order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
+    except TypeError:
+        order_distance = 'Неверный адрес доставки'
     return order_distance
 
 

@@ -90,7 +90,7 @@ def register_order(request):
     for product in serializer.validated_data['products']:
         order_product = get_object_or_404(Product, name=product['product'])
         OrderItem.objects.create(
-            user=get_object_or_404(OrderDetails, id=customer_order.id),
+            user_order_item=get_object_or_404(OrderDetails, id=customer_order.id),
             product=order_product,
             quantity=product['quantity'],
             order_cost=order_product.price * product['quantity']
