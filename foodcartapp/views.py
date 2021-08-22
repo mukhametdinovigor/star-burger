@@ -94,8 +94,7 @@ def register_order(request):
             product=order_product,
             quantity=product['quantity'],
             order_cost=order_product.price * product['quantity']
-            )
+        )
 
-    order_details = {'id': customer_order.id}
-    order_details.update(serializer.data)
+    order_details = {'id': customer_order.id, **serializer.data, }
     return Response(order_details, status=status.HTTP_200_OK)
