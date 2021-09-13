@@ -7,7 +7,6 @@ class Place(models.Model):
         'адрес',
         max_length=100,
         unique=True,
-        db_index=True
     )
     lat = models.CharField(
         'широта',
