@@ -128,7 +128,7 @@ class RestaurantMenuItem(models.Model):
 
 class OrderDetailsQuerySet(models.QuerySet):
     def get_order_with_cost(self):
-        order_with_cost = self.annotate(cost=Sum('order_items__order_cost'))
+        order_with_cost = self.annotate(cost=Sum('order_items__position_cost'))
         return order_with_cost
 
 
@@ -146,12 +146,12 @@ class OrderDetails(models.Model):
                                       choices=[('Наличностью', 'Наличностью'),
                                                ('Электронно', 'Электронно')],
                                       db_index=True)
-    restaurants = models.ForeignKey(Restaurant,
-                                    on_delete=models.SET_NULL,
-                                    related_name='order',
-                                    verbose_name='Рестораны',
-                                    null=True,
-                                    blank=True)
+    restaurant = models.ForeignKey(Restaurant,
+                                   on_delete=models.SET_NULL,
+                                   related_name='orders',
+                                   verbose_name='Рестораны',
+                                   null=True,
+                                   blank=True)
     comments = models.TextField('Комментарии к заказу', blank=True)
     created_at = models.DateTimeField('Время создания', default=timezone.now, db_index=True)
     called_at = models.DateTimeField('Время звонка', blank=True, null=True, db_index=True)
@@ -168,7 +168,7 @@ class OrderDetails(models.Model):
 
 
 class OrderItem(models.Model):
-    user_order_item = models.ForeignKey(
+    order = models.ForeignKey(
         OrderDetails,
         related_name='order_items',
         verbose_name="элементы заказа",
@@ -176,12 +176,12 @@ class OrderItem(models.Model):
     )
     product = models.ForeignKey(
         Product,
-        related_name='orders',
-        verbose_name='Товар',
+        related_name='order_items',
+        verbose_name='продукт',
         on_delete=models.CASCADE, )
     quantity = models.IntegerField('Количество', validators=[MinValueValidator(1)])
-    order_cost = models.DecimalField(
-        'стоимость заказа',
+    position_cost = models.DecimalField(
+        'стоимость позиции',
         max_digits=8,
         decimal_places=2,
         validators=[MinValueValidator(0)], null=True)
@@ -191,4 +191,4 @@ class OrderItem(models.Model):
         verbose_name_plural = 'элементы заказа'
 
     def __str__(self):
-        return f"{self.product.name} {self.user_order_item.firstname} {self.user_order_item.lastname}"
+        return f"{self.product.name} {self.order.firstname} {self.order.lastname}"
