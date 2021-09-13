@@ -149,7 +149,9 @@ def serialize_order(order):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    order_items = OrderDetails.objects.get_order_with_cost().prefetch_related('order_items__product')
+    order_items = OrderDetails.objects.get_order_with_cost().\
+        filter(status='Необработанный').\
+        prefetch_related('order_items__product')
     context = {
         'order_items': [serialize_order(order) for order in order_items],
     }
