@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.db import transaction
 from django.templatetags.static import static
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 
 from .models import Product, OrderItem, OrderDetails

@@ -11,7 +11,7 @@ from .models import RestaurantMenuItem
 from .models import OrderDetails
 from .models import OrderItem
 from place.models import Place
-from star_burger.settings import ALLOWED_HOSTS
+from django.conf import settings
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -126,7 +126,7 @@ class OrderDetailsAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         res = super(OrderDetailsAdmin, self).response_change(request, obj)
         if "next" in request.GET:
-            if url_has_allowed_host_and_scheme(request.GET['next'], ALLOWED_HOSTS):
+            if url_has_allowed_host_and_scheme(request.GET['next'], settings.ALLOWED_HOSTS):
                 return redirect(request.GET['next'])
             return res
         else:
