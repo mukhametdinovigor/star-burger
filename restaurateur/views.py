@@ -9,10 +9,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
-from foodcartapp.models import Product, Restaurant, OrderDetails, RestaurantMenuItem
+from foodcartapp.models import Product, Restaurant, OrderDetails
 from place.models import Place
-from foodcartapp.utils import fetch_coordinates
-from django.conf import settings
 
 
 class Login(forms.Form):
@@ -98,34 +96,27 @@ def view_restaurants(request):
     })
 
 
-def get_order_distance(restaurant_address, order_address):
+def get_order_distance(restaurant_address, order_address, places):
     try:
-        order_place, created = Place.objects.get_or_create(
-            address=order_address,
-            defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(settings.YANDEX_GEOCODE_APIKEY, order_address))}
-        )
-        order_coords = order_place.lat, order_place.lon
-        restaurant_place, created = Place.objects.get_or_create(
-            address=restaurant_address,
-            defaults={key: value for key, value in zip(['lat', 'lon'], fetch_coordinates(settings.YANDEX_GEOCODE_APIKEY, restaurant_address))}
-        )
-        restaurant_coords = restaurant_place.lat, restaurant_place.lon
+        restaurant_attrs = list(filter(lambda x: (x['address'] == restaurant_address), places))[0]
+        order_attrs = list(filter(lambda x: (x['address'] == order_address), places))[0]
+        restaurant_coords = restaurant_attrs['lat'], restaurant_attrs['lon']
+        order_coords = order_attrs['lat'], order_attrs['lon']
         order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
     except TypeError:
         order_distance = 'Неверный адрес доставки'
     return order_distance
 
 
-def serialize_order(order):
-    menu = RestaurantMenuItem.objects.select_related('restaurant')
+def serialize_order(order, places):
     restaurants_in_order = []
     restaurants_in_product = set()
     products_in_order = order.order_items.all()
     for product in products_in_order:
-        restaurants = menu.filter(product_id=product.product.id)
+        restaurants = product.product.menu_items.all()
         for restaurant in restaurants:
             if restaurant.availability:
-                order_distance = get_order_distance(restaurant.restaurant.address, order.address)
+                order_distance = get_order_distance(restaurant.restaurant.address, order.address, places)
                 restaurants_in_product.add(((restaurant.restaurant.name.split()[-1]), order_distance))
         restaurants_in_order.append(restaurants_in_product.copy())
         restaurants_in_product.clear()
@@ -151,9 +142,10 @@ def serialize_order(order):
 def view_orders(request):
     order_items = OrderDetails.objects.get_order_with_cost().\
         filter(status='Необработанный').\
-        prefetch_related('order_items__product')
+        prefetch_related('order_items__product', 'order_items__product__menu_items__restaurant')
+    places = Place.objects.values('address', 'lat', 'lon')
     context = {
-        'order_items': [serialize_order(order) for order in order_items],
+        'order_items': [serialize_order(order, places) for order in order_items],
     }
 
     return render(request, template_name='order_items.html', context=context)

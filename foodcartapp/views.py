@@ -4,9 +4,12 @@ from django.templatetags.static import static
 from rest_framework import status
 
 from .models import Product, OrderItem, OrderDetails
+from place.models import Place
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
+from foodcartapp.utils import fetch_coordinates
+from django.conf import settings
 
 
 def banners_list_api(request):
@@ -93,6 +96,12 @@ def register_order(request):
             quantity=product['quantity'],
             position_cost=product['product'].price * product['quantity']
         )
+
+    place = Place.objects.get_or_create(
+        address=serializer.validated_data['address'],
+        lat=fetch_coordinates(settings.YANDEX_GEOCODE_APIKEY, serializer.validated_data['address'])[0],
+        lon=fetch_coordinates(settings.YANDEX_GEOCODE_APIKEY, serializer.validated_data['address'])[1],
+    )
 
     order_details = {'id': customer_order.id, **serializer.data, }
     return Response(order_details, status=status.HTTP_200_OK)
