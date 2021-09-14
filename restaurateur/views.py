@@ -100,8 +100,8 @@ def view_restaurants(request):
 
 def get_order_distance(restaurant_address, order_address, places):
     try:
-        restaurant_attrs = list(filter(lambda x: (x['address'] == restaurant_address), places))[0]
-        order_attrs = list(filter(lambda x: (x['address'] == order_address), places))[0]
+        restaurant_attrs = list(filter(lambda restaurant: (restaurant['address'] == restaurant_address), places))[0]
+        order_attrs = list(filter(lambda order: (order['address'] == order_address), places))[0]
         restaurant_coords = restaurant_attrs['lat'], restaurant_attrs['lon']
         order_coords = order_attrs['lat'], order_attrs['lon']
         order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
@@ -115,11 +115,10 @@ def serialize_order(order, places):
     restaurants_in_product = set()
     products_in_order = order.order_items.all()
     for product in products_in_order:
-        restaurants = product.product.menu_items.all()
+        restaurants = filter(lambda restaurant: restaurant.availability, product.product.menu_items.all())
         for restaurant in restaurants:
-            if restaurant.availability:
-                order_distance = get_order_distance(restaurant.restaurant.address, order.address, places)
-                restaurants_in_product.add(((restaurant.restaurant.name.split()[-1]), order_distance))
+            order_distance = get_order_distance(restaurant.restaurant.address, order.address, places)
+            restaurants_in_product.add(((restaurant.restaurant.name.split()[-1]), order_distance))
         restaurants_in_order.append(restaurants_in_product.copy())
         restaurants_in_product = set()
     unique_restaurants = restaurants_in_order[0]
@@ -143,8 +142,8 @@ def serialize_order(order, places):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    order_items = OrderDetails.objects.get_order_with_cost().\
-        filter(status='Необработанный').\
+    order_items = OrderDetails.objects.get_order_with_cost(). \
+        filter(status='Необработанный'). \
         prefetch_related('order_items__product', 'order_items__product__menu_items__restaurant')
     places = Place.objects.values('address', 'lat', 'lon')
     context = {
