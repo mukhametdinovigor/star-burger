@@ -119,12 +119,15 @@ def serialize_order(order, places):
                 order_distance = get_order_distance(restaurant.restaurant.address, order.address, places)
                 restaurants_in_product.add(((restaurant.restaurant.name.split()[-1]), order_distance))
         restaurants_in_order.append(restaurants_in_product.copy())
-        restaurants_in_product.clear()
+        restaurants_in_product = set()
     unique_restaurants = restaurants_in_order[0]
-    for index, _ in enumerate(restaurants_in_order):
-        unique_restaurants = unique_restaurants.intersection(restaurants_in_order[index])
+    if unique_restaurants:
+        for index, _ in enumerate(restaurants_in_order):
+            unique_restaurants = unique_restaurants.intersection(restaurants_in_order[index])
 
-    restaurants_in_order = unique_restaurants
+        restaurants_in_order = unique_restaurants
+    else:
+        restaurants_in_order = 'Нет подходящего ресторана'
     return {
         'id': order.id,
         'status': order.status,

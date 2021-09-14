@@ -32,9 +32,13 @@
         <td>
           <details>
             <summary>Развернуть</summary>
+          {% if  'Нет подходящего ресторана' in item.restaurants %}
+            <li>{{ item.restaurants }}
+          {% else %}
             {% for restaurant in item.restaurants %}
-              <li>{{ restaurant.0 }} - {{ restaurant.1 }} км.
+                <li>{{ restaurant.0 }} - {{ restaurant.1 }} км.
             {% endfor %}
+          {% endif %}
           </details>
         </td>
         <td>{{ item.payment_method }}</td>
