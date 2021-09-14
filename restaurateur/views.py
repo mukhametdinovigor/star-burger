@@ -1,3 +1,5 @@
+import functools
+
 from geopy import distance
 
 from django import forms
@@ -122,9 +124,7 @@ def serialize_order(order, places):
         restaurants_in_product = set()
     unique_restaurants = restaurants_in_order[0]
     if unique_restaurants:
-        for index, _ in enumerate(restaurants_in_order):
-            unique_restaurants = unique_restaurants.intersection(restaurants_in_order[index])
-
+        unique_restaurants = functools.reduce(lambda x, y: x.intersection(y), restaurants_in_order)
         restaurants_in_order = unique_restaurants
     else:
         restaurants_in_order = 'Нет подходящего ресторана'
