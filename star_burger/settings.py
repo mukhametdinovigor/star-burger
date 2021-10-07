@@ -3,6 +3,7 @@ import os
 import dj_database_url
 
 from environs import Env
+import rollbar
 
 
 env = Env()
@@ -42,7 +43,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
+
+ROLLBAR = {
+     'access_token': env.str('ROLLBAR_TOKEN'),
+     'environment': env.str('ROLLBAR_DEV') if DEBUG else env.str('ROLLBAR_DEV'),
+     'root': BASE_DIR,
+ }
+
+rollbar.init(**ROLLBAR)
+
 
 ROOT_URLCONF = 'star_burger.urls'
 

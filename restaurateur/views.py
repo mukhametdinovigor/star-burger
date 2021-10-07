@@ -1,4 +1,5 @@
 import functools
+import sys
 
 from geopy import distance
 
@@ -13,6 +14,8 @@ from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, OrderDetails
 from place.models import Place
+
+import rollbar
 
 
 class Login(forms.Form):
@@ -34,29 +37,35 @@ class Login(forms.Form):
 
 class LoginView(View):
     def get(self, request, *args, **kwargs):
-        form = Login()
-        return render(request, "login.html", context={
-            'form': form
-        })
+        try:
+            form = Login()
+            return render(request, "login.html", context={
+                'form': form
+            })
+        except:
+            rollbar.report_exc_info(sys.exc_info())
 
     def post(self, request):
-        form = Login(request.POST)
+        try:
+            form = Login(request.POST)
 
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
 
-            user = authenticate(request, username=username, password=password)
-            if user:
-                login(request, user)
-                if user.is_staff:  # FIXME replace with specific permission
-                    return redirect("restaurateur:RestaurantView")
-                return redirect("start_page")
+                user = authenticate(request, username=username, password=password)
+                if user:
+                    login(request, user)
+                    if user.is_staff:  # FIXME replace with specific permission
+                        return redirect("restaurateur:RestaurantView")
+                    return redirect("start_page")
 
-        return render(request, "login.html", context={
-            'form': form,
-            'ivalid': True,
-        })
+            return render(request, "login.html", context={
+                'form': form,
+                'ivalid': True,
+            })
+        except:
+            rollbar.report_exc_info(sys.exc_info())
 
 
 class LogoutView(auth_views.LogoutView):
@@ -69,33 +78,39 @@ def is_manager(user):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_products(request):
-    restaurants = list(Restaurant.objects.order_by('name'))
-    products = list(Product.objects.prefetch_related('menu_items'))
+    try:
+        restaurants = list(Restaurant.objects.order_by('name'))
+        products = list(Product.objects.prefetch_related('menu_items'))
 
-    default_availability = {restaurant.id: False for restaurant in restaurants}
-    products_with_restaurants = []
-    for product in products:
-        availability = {
-            **default_availability,
-            **{item.restaurant_id: item.availability for item in product.menu_items.all()},
-        }
-        orderer_availability = [availability[restaurant.id] for restaurant in restaurants]
+        default_availability = {restaurant.id: False for restaurant in restaurants}
+        products_with_restaurants = []
+        for product in products:
+            availability = {
+                **default_availability,
+                **{item.restaurant_id: item.availability for item in product.menu_items.all()},
+            }
+            orderer_availability = [availability[restaurant.id] for restaurant in restaurants]
 
-        products_with_restaurants.append(
-            (product, orderer_availability)
-        )
+            products_with_restaurants.append(
+                (product, orderer_availability)
+            )
 
-    return render(request, template_name="products_list.html", context={
-        'products_with_restaurants': products_with_restaurants,
-        'restaurants': restaurants,
-    })
+        return render(request, template_name="products_list.html", context={
+            'products_with_restaurants': products_with_restaurants,
+            'restaurants': restaurants,
+        })
+    except:
+        rollbar.report_exc_info(sys.exc_info())
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_restaurants(request):
-    return render(request, template_name="restaurants_list.html", context={
-        'restaurants': Restaurant.objects.all(),
-    })
+    try:
+        return render(request, template_name="restaurants_list.html", context={
+            'restaurants': Restaurant.objects.all(),
+        })
+    except:
+        rollbar.report_exc_info(sys.exc_info())
 
 
 def get_order_distance(restaurant_address, order_address, places):
@@ -106,6 +121,7 @@ def get_order_distance(restaurant_address, order_address, places):
         order_coords = order_attrs['lat'], order_attrs['lon']
         order_distance = f'{distance.distance(restaurant_coords, order_coords).km:.3f}'
     except TypeError:
+        rollbar.report_exc_info(sys.exc_info())
         order_distance = 'Неверный адрес доставки'
     return order_distance
 
@@ -142,12 +158,15 @@ def serialize_order(order, places):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    order_items = OrderDetails.objects.get_order_with_cost(). \
-        filter(status='Необработанный'). \
-        prefetch_related('order_items__product', 'order_items__product__menu_items__restaurant')
-    places = Place.objects.values('address', 'lat', 'lon')
-    context = {
-        'order_items': [serialize_order(order, places) for order in order_items],
-    }
+    try:
+        order_items = OrderDetails.objects.get_order_with_cost(). \
+            filter(status='Необработанный'). \
+            prefetch_related('order_items__product', 'order_items__product__menu_items__restaurant')
+        places = Place.objects.values('address', 'lat', 'lon')
+        context = {
+            'order_items': [serialize_order(order, places) for order in order_items],
+        }
 
-    return render(request, template_name='order_items.html', context=context)
+        return render(request, template_name='order_items.html', context=context)
+    except:
+        rollbar.report_exc_info(sys.exc_info())
