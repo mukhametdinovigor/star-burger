@@ -63,12 +63,15 @@ python manage.py migrate
 
 Часть настроек проекта берётся из переменных окружения. Чтобы их определить, создайте файл `.env` рядом с `manage.py` и запишите туда данные в таком формате: `ПЕРЕМЕННАЯ=значение`.
 
-Доступны 3 переменные:
+Доступны переменные:
 - `DEBUG` — дебаг-режим. Поставьте `True`, чтобы увидеть отладочную информацию в случае ошибки.
 - `SECRET_KEY` — секретный ключ проекта
 - `ALLOWED_HOSTS` — см [документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `YANDEX_GEOCODE_APIKEY` - API Яндекс-геокодера. Для получения координат места.
                             Получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/services/)
+- `ROLLBAR_TOKEN` - токен для системы логирования ROLLBAR [Сайт ROLLBAR](https://rollbar.com/)
+- `ROLLBAR_DEV` - настройка environment в Rollbar, задайте свое значение например `your_name_dev`
+- `ROLLBAR_PROD` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
 
 Запустите сервер:
 
