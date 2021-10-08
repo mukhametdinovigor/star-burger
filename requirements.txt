@@ -8,3 +8,4 @@ geopy==2.2.0
 phonenumbers==8.12.28
 django-phonenumber-field==5.2.0
 rollbar==0.16.2
+psycopg2==2.9.1

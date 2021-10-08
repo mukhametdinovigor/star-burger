@@ -53,7 +53,7 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
+Создайте базу данных PostgresSQL и отмигрируйте её следующей командой:
 
 ```sh
 python manage.py migrate
@@ -70,8 +70,10 @@ python manage.py migrate
 - `YANDEX_GEOCODE_APIKEY` - API Яндекс-геокодера. Для получения координат места.
                             Получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/services/)
 - `ROLLBAR_TOKEN` - токен для системы логирования ROLLBAR [Сайт ROLLBAR](https://rollbar.com/)
-- `ROLLBAR_DEV` - настройка environment в Rollbar, задайте свое значение например `your_name_dev`
-- `ROLLBAR_PROD` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
+- `ROLLBAR_DEV` - настройка environment в Rollbar, задайте свое значение, например `your_name_dev`
+- `DB_NAME` - название базы данных
+- `DB_USER` - имя пользователя
+- `DB_PASSWORD` - пароль к базе данных
 
 Запустите сервер:
 
@@ -157,6 +159,13 @@ parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 - `DEBUG` — дебаг-режим. Поставьте `False`.
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте. Не стоит использовать значение по-умолчанию, **замените на своё**.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+- `YANDEX_GEOCODE_APIKEY` - API Яндекс-геокодера. Для получения координат места.
+                            Получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/services/)
+- `ROLLBAR_TOKEN` - токен для системы логирования ROLLBAR [Сайт ROLLBAR](https://rollbar.com/)
+- `ROLLBAR_PROD` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
+- `DB_NAME` - название базы данных
+- `DB_USER` - имя пользователя
+- `DB_PASSWORD` - пароль к базе данных
 
 ## Цели проекта
 
