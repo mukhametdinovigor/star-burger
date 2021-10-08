@@ -48,7 +48,7 @@ MIDDLEWARE = [
 
 ROLLBAR = {
      'access_token': env.str('ROLLBAR_TOKEN'),
-     'environment': env.str('ROLLBAR_DEV') if DEBUG else env.str('ROLLBAR_DEV'),
+     'environment': env.str('ROLLBAR_DEV') if DEBUG else env.str('ROLLBAR_PROD'),
      'root': BASE_DIR,
  }
 
@@ -96,9 +96,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env.str('DB_NAME'),
+        'USER': env.str('DB_USER'),
+        'PASSWORD': env.str('DB_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
