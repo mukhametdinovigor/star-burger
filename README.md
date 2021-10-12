@@ -167,6 +167,13 @@ parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 - `DB_USER` - имя пользователя
 - `DB_PASSWORD` - пароль к базе данных
 
+## Данные сайта
+
+- Сайт - https://mhnsite.ru/
+- IP адрес - 77.223.99.81
+- Имя пользователя - root
+
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
