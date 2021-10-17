@@ -70,10 +70,8 @@ python manage.py migrate
 - `YANDEX_GEOCODE_APIKEY` - API Яндекс-геокодера. Для получения координат места.
                             Получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/services/)
 - `ROLLBAR_TOKEN` - токен для системы логирования ROLLBAR [Сайт ROLLBAR](https://rollbar.com/)
-- `ROLLBAR_DEV` - настройка environment в Rollbar, задайте свое значение, например `your_name_dev`
-- `DB_NAME` - название базы данных
-- `DB_USER` - имя пользователя
-- `DB_PASSWORD` - пароль к базе данных
+- `ROLLBAR_ENVIRONMENT` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
+- `DATABASE_URL` - настройка БД, для postgres выглядит так: `postgres://USER:PASSWORD@HOST:PORT/NAME`
 
 Запустите сервер:
 
@@ -162,10 +160,8 @@ parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 - `YANDEX_GEOCODE_APIKEY` - API Яндекс-геокодера. Для получения координат места.
                             Получите API ключ в [кабинете разработчика](https://developer.tech.yandex.ru/services/)
 - `ROLLBAR_TOKEN` - токен для системы логирования ROLLBAR [Сайт ROLLBAR](https://rollbar.com/)
-- `ROLLBAR_PROD` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
-- `DB_NAME` - название базы данных
-- `DB_USER` - имя пользователя
-- `DB_PASSWORD` - пароль к базе данных
+- `ROLLBAR_ENVIRONMENT` - настройка environment в Rollbar, задайте свое значение например `your_name_prod`
+- `DATABASE_URL` - настройка БД, для postgres выглядит так: `postgres://USER:PASSWORD@HOST:PORT/NAME`
 
 ## Данные сайта
 
