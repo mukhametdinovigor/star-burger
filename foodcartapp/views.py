@@ -4,8 +4,9 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.templatetags.static import static
 from rest_framework import status
+from rest_framework.fields import IntegerField
 
-from .models import Product, OrderItem, OrderDetails
+from .models import Product, OrderItem, OrderDetails, Restaurant
 from place.models import Place
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -68,6 +69,28 @@ def product_list_api(request):
         })
     except:
         rollbar.report_exc_info(sys.exc_info())
+
+
+class RestaurantSerializer(ModelSerializer):
+    id = IntegerField(read_only=False)
+
+    class Meta:
+        model = Restaurant
+        fields = ['id',]
+
+
+@api_view(['GET'])
+def show_rest(request):
+    serializer = RestaurantSerializer(data=request.GET)
+    serializer.is_valid(raise_exception=True)
+    restaurant = Restaurant.objects.get(id=serializer.validated_data.get('id'))
+    dumped_restaurant = {
+        'id': restaurant.id,
+        'name': restaurant.name,
+        'address': restaurant.address,
+        'contact_phone': restaurant.contact_phone,
+    }
+    return Response(dumped_restaurant)
 
 
 class OrderItemSerializer(ModelSerializer):
