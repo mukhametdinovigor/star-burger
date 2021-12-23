@@ -6,6 +6,6 @@ environs[django]==9.3.2
 geopy==2.2.0
 phonenumbers==8.12.28
 Pillow==8.2.0
-psycopg2==2.9.1
+psycopg2-binary==2.*
 requests==2.26.0
 rollbar==0.16.2

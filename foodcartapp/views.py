@@ -4,15 +4,21 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.templatetags.static import static
 from rest_framework import status
+from rest_framework.fields import IntegerField
 
-from .models import Product, OrderItem, OrderDetails
+from .models import Product, OrderItem, OrderDetails, Restaurant
 from place.models import Place
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from foodcartapp.utils import fetch_coordinates
 from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
 import rollbar
+from environs import Env
+
+env = Env()
+env.read_env()
 
 
 def banners_list_api(request):
@@ -68,6 +74,33 @@ def product_list_api(request):
         })
     except:
         rollbar.report_exc_info(sys.exc_info())
+
+
+class RestaurantSerializer(ModelSerializer):
+    id = IntegerField(read_only=False)
+
+    class Meta:
+        model = Restaurant
+        fields = ['id', ]
+
+
+@api_view(['GET'])
+def show_restaurant(request):
+    allowed_ips = env.list('ALLOWED_IPS')
+    if request.META['REMOTE_ADDR'] not in allowed_ips:
+        return redirect('start_page')
+    serializer = RestaurantSerializer(data=request.GET)
+    serializer.is_valid(raise_exception=True)
+    restaurant_id = serializer.validated_data['id']
+    specific_restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    dumped_restaurant = {
+        'id': specific_restaurant.id,
+        'name': specific_restaurant.name,
+        'address': specific_restaurant.address,
+        'contact_phone': specific_restaurant.contact_phone,
+        'headers': request.headers,
+    }
+    return Response(dumped_restaurant)
 
 
 class OrderItemSerializer(ModelSerializer):
